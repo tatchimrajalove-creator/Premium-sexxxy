@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Access - Premium</title>
+    
+    <script src="https://www.campay.net/static/pay_button.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: #fff; margin: 0; padding: 20px; text-align: center; }
+        .card { background: #161616; padding: 35px 25px; border-radius: 25px; border: 1px solid #333; max-width: 420px; margin: 40px auto; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+        h1 { color: #ff9800; text-transform: uppercase; letter-spacing: 1.5px; }
+        .price { font-size: 45px; font-weight: bold; margin: 25px 0; }
+        .btn-pay { background: #ff9800; color: #000; border: none; padding: 20px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        #premium-content { display: none; }
+        .gallery img, .gallery video { width: 100%; border-radius: 15px; margin-top: 20px; border: 1px solid #444; }
+    </style>
+</head>
+<body>
+
+    <div id="lock-screen" class="card">
+        <div style="font-size: 60px;">💎</div>
+        <h1>Espace VIP</h1>
+        <p>Accès exclusif aux photos et vidéos.</p>
+        <div class="price">100 <span style="font-size:20px; color:#ff9800;">FCFA</span></div>
+        <button class="btn-pay" onclick="lancerPaiement()">DÉBLOQUER MAINTENANT</button>
+    </div>
+
+    <div id="premium-content" class="card" style="max-width: 600px;">
+        <h1 style="color: #00e676;">🔓 ACCÈS DÉBLOQUÉ</h1>
+        <div class="gallery">
+            <img src="mon_image.jpg" alt="Photo Premium">
+            <video controls poster="mon_image.jpg">
+                <source src="ma_video.mp4" type="video/mp4">
+            </video>
+        </div>
+        <br>
+        <button onclick="logout()" style="background:none; color:#444; border:none; cursor:pointer;">Se déconnecter</button>
+    </div>
+
+    <script>
+        // --- CONFIGURATION FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyArRhViFxO-UMbRuFdMjcynEZ0a7qzTRR4",
+            authDomain: "premium-site-sexxxy.firebaseapp.com",
+            databaseURL: "https://premium-site-sexxxy-default-rtdb.firebaseio.com",
+            projectId: "premium-site-sexxxy",
+            storageBucket: "premium-site-sexxxy.firebasestorage.app",
+            messagingSenderId: "551279108874",
+            appId: "1:551279108874:web:a0122b5e3cd1bb3d9110f3"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // --- FONCTION DE PAIEMENT ---
+        function lancerPaiement() {
+            if (typeof Campay === "undefined") {
+                alert("Erreur: CamPay ne charge pas. Utilise ton lien GitHub (HTTPS).");
+                return;
+            }
+
+            Campay.pay({
+                amount: "100",
+                currency: "XAF",
+                external_reference: "VIP_" + Date.now(),
+                // TES CLÉS CAM PAY
+                app_key: "JeYyGBdhSFrlFkXrNUyEA-OLY7CmbCze-1Txc_LM1Cy-W5-TKHu2puILbwikM_qoUz_8zwStIMoZH17KlcPo0Q",
+                app_secret: "OKkPyMdModenXITZeWHNEjuewz5lo33s6AnJSq1XJtFr9I_ujTGGpkgHIObEw4wj0yM3_KRoylmqhHHJrCapaw",
+                
+                onSuccess: function(data) {
+                    database.ref('ventes').push({ date: new Date().toLocaleString(), statut: "Succès" });
+                    localStorage.setItem("vip_unlocked", "true");
+                    afficherVIP();
+                }
+            });
+        }
+
+        function afficherVIP() {
+            document.getElementById("lock-screen").style.display = "none";
+            document.getElementById("premium-content").style.display = "block";
+        }
+
+        function logout() {
+            localStorage.removeItem("vip_unlocked");
+            window.location.reload();
+        }
+
+        if (localStorage.getItem("vip_unlocked") === "true") {
+            afficherVIP();
+        }
+    </script>
+</body>
+</html>
+
+
